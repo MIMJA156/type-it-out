@@ -2,6 +2,7 @@ use std::{collections::VecDeque, sync::{Arc, Mutex, atomic::{AtomicBool, Orderin
 use tauri::{Emitter, Listener, Manager, State};
 use enigo::{Enigo, Keyboard, Settings};
 use rdev::listen;
+
 struct AppData {
     watching_for_activation_key: bool,
     string_to_type: Option<String>,
@@ -11,15 +12,16 @@ struct AppData {
 #[tauri::command]
 fn start_watcher(state: State<'_, Mutex<AppData>>, to_type: String) {
     let mut state = state.lock().unwrap();
-    state.watching_for_activation_key = true;
+    state.stop_typing_flag.store(false, Ordering::Relaxed);
     state.string_to_type = Some(to_type);
+    state.watching_for_activation_key = true;
 }
 
 #[tauri::command]
 fn abort_current(state: State<'_, Mutex<AppData>>) {
     let mut state = state.lock().unwrap();
-    state.watching_for_activation_key = false;
     state.stop_typing_flag.store(true, Ordering::Relaxed);
+    state.watching_for_activation_key = false;
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
