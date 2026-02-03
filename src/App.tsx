@@ -1,4 +1,4 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import Loading from "./Loading";
@@ -7,8 +7,10 @@ import "./style.css";
 function App() {
 	const [contents, setContents] = useState("");
 
-	const [ui, setUi] = useState<"idle" | "watching" | "typing" | "finished">("idle");
+	const [ui, setUi] = useState<"idle" | "watching" | "typing" | "finished" | "aborted">("idle");
 	const [progress, setProgress] = useState(0);
+
+	const uiRef = useRef(ui);
 
 	const hasContents = contents.length <= 0;
 	const locked = ui === "typing" || ui === "watching";
@@ -28,9 +30,13 @@ function App() {
 	};
 
 	const stopTyping = () => {
-		setUi("idle");
+		setUi("aborted");
 		invoke("abort_current");
 	};
+
+	useEffect(() => {
+		uiRef.current = ui;
+	}, [ui]);
 
 	useEffect(() => {
 		let unListenTypingProgress = listen("progress-typing", (event) => {
@@ -41,7 +47,11 @@ function App() {
 		});
 
 		let unListenStartedTyping = listen("started-typing", () => setUi("typing"));
-		let unListenTypingCancel = listen("cancel-key-pressed", () => setUi("idle"));
+		let unListenTypingCancel = listen("cancel-key-pressed", () => {
+			if (uiRef.current !== "idle" && uiRef.current !== "finished") {
+				setUi("aborted");
+			}
+		});
 
 		return () => {
 			unListenStartedTyping.then(f => f());
@@ -111,8 +121,12 @@ function App() {
 				{ui === "finished" &&
 					<div class={"flex flex-col"}>
 						<span class={"text-xl"}>Finished Typing!</span>
-						<span>progress:</span>
-						<progress value={1} class={"w-64"}></progress>
+					</div>
+				}
+
+				{ui === "aborted" &&
+					<div class={"flex flex-col"}>
+						<span class={"text-xl"}>Typing Aborted!</span>
 					</div>
 				}
 			</div>
