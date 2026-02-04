@@ -1,19 +1,28 @@
 use std::{collections::VecDeque, sync::{Arc, Mutex, atomic::{AtomicBool, Ordering}, mpsc::{self, Receiver, Sender}}, thread, time::Duration};
+use rand::Rng;
 use tauri::{Emitter, Listener, Manager, State};
 use enigo::{Enigo, Keyboard, Settings};
 use rdev::listen;
 
+struct TypingThreadPacket {
+    target: String,
+    upper: u64,
+    lower: u64
+}
+
 struct AppData {
     watching_for_activation_key: bool,
     string_to_type: Option<String>,
+    character_delay_range: Option<(u64, u64)>,
     stop_typing_flag: Arc<AtomicBool>
 }
 
 #[tauri::command]
-fn start_watcher(state: State<'_, Mutex<AppData>>, to_type: String) {
+fn start_watcher(state: State<'_, Mutex<AppData>>, to_type: String, lower_delay: u64, upper_delay: u64) {
     let mut state = state.lock().unwrap();
     state.stop_typing_flag.store(false, Ordering::Relaxed);
     state.string_to_type = Some(to_type);
+    state.character_delay_range = Some((lower_delay, upper_delay));
     state.watching_for_activation_key = true;
 }
 
@@ -26,7 +35,7 @@ fn abort_current(state: State<'_, Mutex<AppData>>) {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let (string_sender, string_receiver): (Sender<String>, Receiver<String>) = mpsc::channel();
+    let (typing_packet_sender, typing_packet_receiver): (Sender<TypingThreadPacket>, Receiver<TypingThreadPacket>) = mpsc::channel();
     let stop_typing_flag = Arc::new(AtomicBool::new(false));
 
     tauri::Builder::default()
@@ -34,6 +43,7 @@ pub fn run() {
             AppData {
                 watching_for_activation_key: false,
                 string_to_type: None,
+                character_delay_range: None,
                 stop_typing_flag: stop_typing_flag.clone()
             }
         ))
@@ -64,16 +74,18 @@ pub fn run() {
                 let mut enigo = Enigo::new(&Settings::default()).unwrap();
 
                 loop {
-                    let str = string_receiver.recv();
-                    if let Ok(str) = str {
+                    let packet: Result<TypingThreadPacket, mpsc::RecvError> = typing_packet_receiver.recv();
+
+                    if let Ok(packet) = packet {
                         thread::sleep(Duration::from_millis(20));
 
                         let mut queue = VecDeque::new();
-                        for char in str.chars() {
+                        for char in packet.target.chars() {
                             queue.push_back(char);
                         }
 
                         let total = queue.len();
+                        let mut rng = rand::rng();
 
                         'inner: while !queue.is_empty() {
                             if stop_typing_flag.load(Ordering::Relaxed) {
@@ -83,7 +95,7 @@ pub fn run() {
                             let char = queue.pop_front();
                             if let Some(char) = char {
                                 _ = enigo.text(&char.to_string());
-                                thread::sleep(Duration::from_millis(20));
+                                thread::sleep(Duration::from_millis(rng.random_range(packet.lower..(packet.upper + 1))));
                             }
 
                             _ = keyboard_emulator_handle.emit("progress-typing", 1.0 - (queue.len() as f32 / total as f32));
@@ -103,8 +115,12 @@ pub fn run() {
                     state.watching_for_activation_key = false;
                     start_listen_handler.emit("started-typing", ()).unwrap();
 
-                    if let Some(str) = &state.string_to_type {
-                        _ = string_sender.send(str.clone());
+                    if let (Some(str), Some(range)) = (&state.string_to_type, &state.character_delay_range) {
+                        _ = typing_packet_sender.send(TypingThreadPacket {
+                            target: str.clone(),
+                            lower: range.0,
+                            upper: range.1
+                        });
                     }
                 }
             });
