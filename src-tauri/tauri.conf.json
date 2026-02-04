@@ -22,8 +22,9 @@
     }
   },
   "bundle": {
+    "createUpdaterArtifacts": true,
     "active": true,
-    "targets": "all",
+    "targets": "nsis",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -31,5 +32,13 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEMwMDZEQ0ExQjE3Qzc1NEIKUldSTGRYeXhvZHdHd0c4MjhwdEJLVmpwbHptcmxybDd3TVF1MXAzVXVYZVlZQ2RoSDFrSjZyK3cK",
+      "endpoints": [
+        "https://github.com/mimja156/type-it-out/releases/latest/download/latest.json"
+      ]
+    }
   }
 }

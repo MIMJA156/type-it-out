@@ -1,166 +1,70 @@
-import { useEffect, useRef, useState } from "preact/hooks";
-import { listen } from "@tauri-apps/api/event";
-import { invoke } from "@tauri-apps/api/core";
-import Loading from "./Loading";
+import { check } from "@tauri-apps/plugin-updater";
+import { useEffect, useState } from "preact/hooks";
+import { Loader2 } from "lucide-preact";
+import TypeItOut from "./TypeItOut";
 import "./style.css";
+import { relaunch } from "@tauri-apps/plugin-process";
+import Loading from "./Loading";
 
 function App() {
-	const [contents, setContents] = useState("");
+	const [ui, setUi] = useState<"checking" | "updating" | "completed">("checking");
 
-	const [ui, setUi] = useState<"idle" | "watching" | "typing" | "finished" | "aborted">("idle");
-	const [progress, setProgress] = useState(0);
+	const update = async () => {
+		const update = await check();
+		if (update) {
+			console.log(`found update ${update.version} from ${update.date} with notes ${update.body}`);
+			setUi("updating");
 
-	const [lowerTypingDelay, setLowerTypingDelay] = useState(20);
-	const [upperTypingDelay, setUpperTypingDelay] = useState(40);
+			let downloaded = 0;
+			let contentLength = 0;
 
-	const uiRef = useRef(ui);
+			await update.downloadAndInstall((event) => {
+				switch (event.event) {
+					case "Started":
+						contentLength = event.data.contentLength ?? 0;
+						console.log(`started downloading ${event.data.contentLength} bytes`);
+						break;
 
-	const hasContents = contents.length <= 0;
-	const locked = ui === "typing" || ui === "watching";
+					case "Progress":
+						downloaded += event.data.chunkLength;
+						console.log(`downloaded ${downloaded} from ${contentLength}`);
+						break;
 
-	const handleTextareaChange = (event: InputEvent) => {
-		if (!event.target) return;
-		let target = event.target as HTMLTextAreaElement;
-		setContents(target.value);
-	};
+					case "Finished":
+						console.log("download finished");
+						break;
+				}
+			});
 
-	const handleLowerTypingDelayChange = (event: InputEvent) => {
-		if (!event.target) return;
-		let target = event.target as HTMLInputElement;
-		setLowerTypingDelay(Number(target.value));
-	};
-
-	const handleUpperTypingDelayChange = (event: InputEvent) => {
-		if (!event.target) return;
-		let target = event.target as HTMLInputElement;
-		setUpperTypingDelay(Number(target.value));
-	};
-
-	const startTyping = () => {
-		setUi("watching");
-		invoke("start_watcher", {
-			toType: contents,
-			lowerDelay: lowerTypingDelay,
-			upperDelay: upperTypingDelay
-		});
-	};
-
-	const stopTyping = () => {
-		setUi("aborted");
-		invoke("abort_current");
+			console.log("update installed");
+			await relaunch();
+		}
 	};
 
 	useEffect(() => {
-		uiRef.current = ui;
-	}, [ui]);
-
-	useEffect(() => {
-		let unListenTypingProgress = listen("progress-typing", (event) => {
-			let progress = event.payload as number;
-			setProgress(progress);
-
-			if (progress === 1) setUi("finished");
+		update().catch(() => {
+			setUi("completed");
 		});
-
-		let unListenStartedTyping = listen("started-typing", () => setUi("typing"));
-		let unListenTypingCancel = listen("cancel-key-pressed", () => {
-			if (uiRef.current !== "idle" && uiRef.current !== "finished") {
-				setUi("aborted");
-			}
-		});
-
-		return () => {
-			unListenStartedTyping.then(f => f());
-			unListenTypingProgress.then(f => f());
-			unListenTypingCancel.then(f => f());
-		};
 	}, []);
 
 	return (
-		<main class={"w-screen h-screen bg-stone-800 text-white/90 p-4 flex flex-col gap-8"}>
-			<div class={"flex flex-col gap-2"}>
-				<span class={"text-2xl"}>
-					Type It Out!
-				</span>
-				<span class={"text-lg text-white/80"}>
-					Type in the text box to get started.
-				</span>
-			</div>
-
-			<div class={"flex flex-col gap-2"}>
-				<span class={"text-lg"}>typing delay range:</span>
-				<div class={"flex gap-2"}>
-					<div class={"flex flex-col"}>
-						<label for="lower">lower (ms)</label>
-						<input id="lower" type="number" class={"border-2 not-disabled:border-stone-400 disabled:border-stone-700"} onInput={handleLowerTypingDelayChange} value={lowerTypingDelay} disabled={locked} />
-					</div>
-					<div class={"flex flex-col"}>
-						<label for="upper">upper (ms)</label>
-						<input id="upper" type="number" class={"border-2 not-disabled:border-stone-400 disabled:border-stone-700"} onInput={handleUpperTypingDelayChange} value={upperTypingDelay} disabled={locked} />
-					</div>
+		<main class={"w-screen h-screen bg-stone-800 text-white/90"}>
+			{ui === "completed" && <TypeItOut />}
+			{ui === "checking" &&
+				<div class="h-full flex flex-col justify-center items-center">
+					<Loader2 class={"animate-spin"} size={32} />
+					<span>checking for updates</span>
 				</div>
-			</div>
-
-			<textarea
-				onInput={handleTextareaChange}
-				value={contents}
-				class={"w-full h-28 min-h-28 max-h-56 border-2 not-disabled:border-stone-400 disabled:border-stone-700"}
-				disabled={locked}
-			/>
-
-			<div class={"flex flex-col gap-3"}>
-				<div class={"flex flex-row gap-4"}>
-					<button
-						class={"px-4 py-2 outline not-disabled:cursor-pointer bg-stone-700 not-disabled:hover:bg-stone-700/70 disabled:brightness-75"}
-						disabled={hasContents || locked}
-						onClick={startTyping}
-					>
-						Start Watching
-					</button>
-					<button
-						class={"px-4 py-2 outline not-disabled:cursor-pointer bg-stone-700 not-disabled:hover:bg-stone-700/70 disabled:brightness-75"}
-						disabled={hasContents || !locked}
-						onClick={stopTyping}
-					>
-						Cancel
-					</button>
+			}
+			{ui === "updating" &&
+				<div class="h-full flex flex-col justify-center items-center">
+					<Loading
+						text="update found! updating app to latest version"
+						frames={[".", "..", "...", "....", "....."]}
+						delay={250}
+					/>
 				</div>
-
-				{ui === "watching" &&
-					<div class={"flex flex-col"}>
-						<span>start key {"->"} Right Control</span>
-						<Loading
-							text="watching for start key"
-							frames={[".", "..", "...", "....", "....."]}
-							delay={250}
-						/>
-					</div>
-				}
-
-				{ui === "typing" &&
-					<div class={"flex flex-col"}>
-						<Loading
-							text="Started! Typing given contents"
-							frames={[".", "..", "...", "....", "....."]}
-							delay={250}
-						/>
-						<span>progress:</span>
-						<progress value={progress} class={"w-64"}></progress>
-					</div>
-				}
-
-				{ui === "finished" &&
-					<div class={"flex flex-col"}>
-						<span class={"text-xl"}>Finished Typing!</span>
-					</div>
-				}
-
-				{ui === "aborted" &&
-					<div class={"flex flex-col"}>
-						<span class={"text-xl"}>Typing Aborted!</span>
-					</div>
-				}
-			</div>
+			}
 		</main>
 	);
 }
