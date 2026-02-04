@@ -1,0 +1,40 @@
+name: build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release-tauri:
+    permissions:
+      contents: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [{ os: windows-latest, arch: none }]
+
+    runs-on: ${{ matrix.platform.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: install rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: install frontend dependencies
+        run: npm install
+
+      - uses: "mimja156/tauri-build-action@main"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          arch: ${{ matrix.platform.arch }}
+          release-tag: App-$VERSION
+          release-name: App $VERSION
+          release-body: This release was auto generated using github actions!
