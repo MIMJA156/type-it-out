@@ -3,11 +3,37 @@ import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import Loading from "./Loading";
 
+function s(time: number) {
+    return time !== 1 ? "s" : ""
+}
+
+function format(ms: number) {
+    if (ms < 1000) return "less then a second";
+
+    let seconds = Math.floor(ms / 1000);
+    if (seconds > 60) {
+        let minutes = Math.floor(seconds / 60);
+        let remainingSeconds = (seconds - minutes * 60);
+
+        if (minutes > 60) return "over an hour";
+
+        return `${minutes} minute${s(minutes)} and ${remainingSeconds} second${s(remainingSeconds)}`;
+    }
+
+    return `${seconds} second${seconds !== 1 ? "s" : ""}`;
+}
+
+type TypingThreadProgress = {
+    progress: number,
+    timeLeft: number
+};
+
 function TypeItOut() {
     const [contents, setContents] = useState("");
 
     const [ui, setUi] = useState<"idle" | "watching" | "typing" | "finished" | "aborted">("idle");
     const [progress, setProgress] = useState(0);
+    const [timeLeft, setTimeLeft] = useState(0);
 
     const [lowerTypingDelay, setLowerTypingDelay] = useState(20);
     const [upperTypingDelay, setUpperTypingDelay] = useState(40);
@@ -55,10 +81,12 @@ function TypeItOut() {
 
     useEffect(() => {
         let unListenTypingProgress = listen("progress-typing", (event) => {
-            let progress = event.payload as number;
-            setProgress(progress);
+            let packet = event.payload as TypingThreadProgress;
 
-            if (progress === 1) setUi("finished");
+            setProgress(packet.progress);
+            setTimeLeft(packet.timeLeft);
+
+            if (packet.progress === 1) setUi("finished");
         });
 
         let unListenStartedTyping = listen("started-typing", () => setUi("typing"));
@@ -145,6 +173,7 @@ function TypeItOut() {
                         />
                         <span>progress:</span>
                         <progress value={progress} class={"w-64"}></progress>
+                        <span>time left: {format(timeLeft)}</span>
                     </div>
                 }
 

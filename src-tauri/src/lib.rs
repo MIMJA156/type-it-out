@@ -1,6 +1,7 @@
 use enigo::{Enigo, Keyboard, Settings};
 use rand::Rng;
 use rdev::listen;
+use serde::Serialize;
 use std::{
     collections::VecDeque,
     sync::{
@@ -17,6 +18,18 @@ struct TypingThreadPacket {
     target: String,
     upper: u64,
     lower: u64,
+}
+
+struct TypingThreadChar {
+    char: char,
+    wait: u64
+}
+
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct TypingThreadProgress {
+    progress: f32,
+    time_left: u32
 }
 
 struct AppData {
@@ -93,14 +106,24 @@ pub fn run() {
 
                     if let Ok(packet) = packet {
                         thread::sleep(Duration::from_millis(20));
+                        let mut rng = rand::rng();
 
-                        let mut queue = VecDeque::new();
+                        let mut total_size = 0;
+                        let mut total_time = 0;
+                        let mut time_passed = 0;
+
+                        let mut queue: VecDeque<TypingThreadChar> = VecDeque::new();
                         for char in packet.target.chars() {
-                            queue.push_back(char);
+                            let wait = rng.random_range(packet.lower..(packet.upper + 1));
+                            total_time += wait;
+                            total_size += 1;
+                            queue.push_back(TypingThreadChar { char, wait });
                         }
 
-                        let total = queue.len();
-                        let mut rng = rand::rng();
+                        _ = keyboard_emulator_handle.emit("progress-typing", TypingThreadProgress {
+                            progress: 0.0,
+                            time_left: total_time as u32
+                        });
 
                         'inner: while !queue.is_empty() {
                             if stop_typing_flag.load(Ordering::Relaxed) {
@@ -109,14 +132,15 @@ pub fn run() {
 
                             let char = queue.pop_front();
                             if let Some(char) = char {
-                                _ = enigo.text(&char.to_string());
-                                thread::sleep(Duration::from_millis(
-                                    rng.random_range(packet.lower..(packet.upper + 1)),
-                                ));
+                                _ = enigo.text(&char.char.to_string());
+                                thread::sleep(Duration::from_millis(char.wait));
+                                time_passed += char.wait;
                             }
 
-                            _ = keyboard_emulator_handle
-                                .emit("progress-typing", 1.0 - (queue.len() as f32 / total as f32));
+                            _ = keyboard_emulator_handle.emit("progress-typing", TypingThreadProgress {
+                                progress: 1.0 - (queue.len() as f32 / total_size as f32),
+                                time_left: (total_time - time_passed) as u32
+                            });
                         }
 
                         stop_typing_flag.store(false, Ordering::Relaxed);
