@@ -56,7 +56,6 @@ pub fn run() {
     let stop_typing_flag = Arc::new(AtomicBool::new(false));
 
     tauri::Builder::default()
-        .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .manage(Mutex::new(AppData {
             watching_for_activation_key: false,

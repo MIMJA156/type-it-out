@@ -2,9 +2,8 @@ import { check } from "@tauri-apps/plugin-updater";
 import { useEffect, useState } from "preact/hooks";
 import { Loader2 } from "lucide-preact";
 import TypeItOut from "./TypeItOut";
-import "./style.css";
-import { relaunch } from "@tauri-apps/plugin-process";
 import Loading from "./Loading";
+import "./style.css";
 
 function App() {
 	const [ui, setUi] = useState<"checking" | "updating" | "completed">("checking");
@@ -35,9 +34,8 @@ function App() {
 						break;
 				}
 			});
-
-			console.log("update installed");
-			await relaunch();
+		} else {
+			setUi("completed");
 		}
 	};
 
