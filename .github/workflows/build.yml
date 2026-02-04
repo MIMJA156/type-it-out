@@ -35,6 +35,6 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           arch: ${{ matrix.platform.arch }}
-          release-tag: App-$VERSION
-          release-name: App $VERSION
+          release-tag: type-it-out-$VERSION
+          release-name: Type It Out $VERSION
           release-body: This release was auto generated using github actions!
