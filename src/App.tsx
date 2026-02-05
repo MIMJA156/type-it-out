@@ -46,7 +46,7 @@ function App() {
 	}, []);
 
 	return (
-		<main class={"w-screen h-screen bg-stone-800 text-white/90"}>
+		<main class={"w-screen h-screen bg-neutral-900 text-white/90 bg-[url(carbon.png)] bg-size-[55px] bg-blend-darken"}>
 			{ui === "completed" && <TypeItOut />}
 			{ui === "checking" &&
 				<div class="h-full flex flex-col justify-center items-center">

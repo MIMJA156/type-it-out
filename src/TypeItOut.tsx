@@ -16,11 +16,10 @@ function format(ms: number) {
         let remainingSeconds = (seconds - minutes * 60);
 
         if (minutes > 60) return "over an hour";
-
         return `${minutes} minute${s(minutes)} and ${remainingSeconds} second${s(remainingSeconds)}`;
     }
 
-    return `${seconds} second${seconds !== 1 ? "s" : ""}`;
+    return `${seconds} second${s(seconds)}`;
 }
 
 type TypingThreadProgress = {
