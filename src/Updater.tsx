@@ -30,6 +30,8 @@ function Updater() {
                         break;
                 }
             });
+
+            console.log(`downloaded: ${downloaded}, contentLength: ${contentLength}`);
         } else {
             setUi("completed");
         }

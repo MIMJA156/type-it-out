@@ -1,11 +1,11 @@
-import { LucideCircleQuestionMark, LucideHome, LucideSettings } from "lucide-preact";
+import { LucideHome, LucideSettings } from "lucide-preact";
 import { useState } from "preact/hooks";
 import { create } from "zustand";
 
+import { useLocked } from "./useLocked";
 import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import Home from "./pages/Home";
-import { useLocked } from "./useLocked";
 
 interface AppSettingsStore {
 	upperDelayBound: number,
