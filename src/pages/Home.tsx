@@ -146,8 +146,8 @@ function Home() {
                             </div>
                         }
 
-                        {stage === "finished" && <span>Finished Typing!</span>}
-                        {stage === "cancelled" && <span>Typing Aborted!</span>}
+                        {stage === "finished" && <span>finished typing</span>}
+                        {stage === "cancelled" && <span>typing aborted</span>}
                     </div>
                 </div>
             </div>
