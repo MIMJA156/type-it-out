@@ -1,6 +1,7 @@
 import { LucideHome, LucideSettings } from "lucide-preact";
-import { getVersion } from "@tauri-apps/api/app";
 import { useEffect, useState } from "preact/hooks";
+import { getVersion } from "@tauri-apps/api/app";
+import { persist } from "zustand/middleware";
 import { create } from "zustand";
 
 import { useLocked } from "./useLocked";
@@ -16,13 +17,18 @@ interface AppSettingsStore {
 	setLowerDelayBound: (lower: number) => void
 };
 
-export const useAppSettings = create<AppSettingsStore>((set) => ({
-	upperDelayBound: 100,
-	lowerDelayBound: 50,
+export const useAppSettings = create<AppSettingsStore>()(
+	persist(
+		(set) => ({
+			upperDelayBound: 100,
+			lowerDelayBound: 50,
 
-	setUpperDelayBound: (upper) => set(() => ({ upperDelayBound: upper })),
-	setLowerDelayBound: (lower) => set(() => ({ lowerDelayBound: lower }))
-}));
+			setUpperDelayBound: (upper) => set(() => ({ upperDelayBound: upper })),
+			setLowerDelayBound: (lower) => set(() => ({ lowerDelayBound: lower }))
+		}),
+		{ name: "app-settings", version: 1 }
+	)
+);
 
 type Stages = "idle" | "watching" | "typing" | "finished" | "cancelled";
 interface AppStateStore {
