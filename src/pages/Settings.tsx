@@ -1,0 +1,54 @@
+import { useAppSettings } from "../App";
+
+function Settings() {
+    const upperDelayBound = useAppSettings((state) => state.upperDelayBound);
+    const lowerDelayBound = useAppSettings((state) => state.lowerDelayBound);
+    const setUpperDelayBound = useAppSettings((state) => state.setUpperDelayBound);
+    const setLowerDelayBound = useAppSettings((state) => state.setLowerDelayBound);
+
+    const handleUpperTypingDelayChange = (event: InputEvent) => {
+        if (!event.target) return;
+        let target = event.target as HTMLInputElement;
+        setUpperDelayBound(Number(target.value));
+    };
+
+    const handleLowerTypingDelayChange = (event: InputEvent) => {
+        if (!event.target) return;
+        let target = event.target as HTMLInputElement;
+        setLowerDelayBound(Number(target.value));
+    };
+
+    return (
+        <div class={"p-4 flex flex-col gap-4"}>
+            <span class={"text-2xl"}>Settings</span>
+
+            <div class={"flex flex-col gap-2"}>
+                <span class={"text-lg"}>typing delay range:</span>
+                <div class={"flex gap-2"}>
+                    <div class={"flex flex-col"}>
+                        <label for="lower">lower (ms)</label>
+                        <input
+                            id="lower"
+                            type="number"
+                            class={"border-2 not-disabled:border-stone-400 disabled:border-stone-700"}
+                            value={lowerDelayBound}
+                            onInput={handleLowerTypingDelayChange}
+                        />
+                    </div>
+                    <div class={"flex flex-col"}>
+                        <label for="upper">upper (ms)</label>
+                        <input
+                            id="upper"
+                            type="number"
+                            class={"border-2 not-disabled:border-stone-400 disabled:border-stone-700"}
+                            value={upperDelayBound}
+                            onInput={handleUpperTypingDelayChange}
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default Settings;

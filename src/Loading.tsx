@@ -22,10 +22,6 @@ export default function Loading({
     }, []);
 
     return (
-        <div>
-            <span class={"text-xl"}>
-                {text}{frames[counter % frames.length]}
-            </span>
-        </div>
+        <span>{text}{frames[counter % frames.length]}</span>
     );
 }

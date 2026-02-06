@@ -1,4 +1,4 @@
 import { render } from "preact";
-import App from "./App";
+import Updater from "./Updater";
 
-render(<App />, document.getElementById("root")!);
+render(<Updater />, document.getElementById("root")!);

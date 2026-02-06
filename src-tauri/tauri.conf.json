@@ -14,7 +14,10 @@
       {
         "title": "type-it-out",
         "width": 800,
-        "height": 600
+        "height": 440,
+        "backgroundColor": "#171717",
+        "resizable": false,
+        "maximizable": false
       }
     ],
     "security": {
