@@ -47,17 +47,25 @@ function App() {
 	return (
 		<div class={"grid grid-cols-[70px_auto] h-full w-full bg-neutral-900 bg-[url(carbon.png)] bg-size-[55px] bg-blend-darken"}>
 			<div class={"bg-neutral-800 border-r border-neutral-700 flex flex-col items-center gap-6 pt-6"}>
-				<button onClick={() => setUi("home")} disabled={locked} >
+				<button
+					onClick={() => setUi("home")}
+					disabled={locked}
+					class={"not-disabled:cursor-pointer"}
+				>
 					<LucideHome
 						size={"36px"}
-						class={`${ui === "home" ? "stroke-zinc-200" : "stroke-zinc-400"} cursor-pointer`}
+						class={ui === "home" ? `${locked ? "stroke-zinc-600" : "stroke-zinc-200"}` : `stroke-zinc-400`}
 					/>
 				</button>
 
-				<button onClick={() => setUi("settings")} disabled={locked} >
+				<button
+					onClick={() => setUi("settings")}
+					disabled={locked}
+					class={"not-disabled:cursor-pointer"}
+				>
 					<LucideSettings
 						size={"36px"}
-						class={`${ui === "settings" ? "stroke-zinc-200" : "stroke-zinc-400"} cursor-pointer`}
+						class={ui === "settings" ? "stroke-zinc-200" : `${locked ? "stroke-zinc-600" : "stroke-zinc-400"}`}
 					/>
 				</button>
 
