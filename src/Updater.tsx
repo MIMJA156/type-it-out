@@ -42,7 +42,7 @@ function Updater() {
     }, []);
 
     return (
-        <main class={"w-screen h-screen bg-neutral-900 text-white/90"}>
+        <main class={"w-screen h-screen bg-neutral-900 text-white/80"}>
             {ui === "completed" && <App />}
 
             {ui === "checking" &&

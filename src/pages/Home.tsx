@@ -98,7 +98,7 @@ function Home() {
         <div class={"flex flex-col justify-between gap-4 p-4 h-full"}>
             <div class={"flex flex-col"}>
                 <span class={"text-4xl"}>Type It Out</span>
-                <span class={"text-md text-white/80"}>Developed by: mimja</span>
+                <span class={"text-md text-white/70"}>Developed by: mimja</span>
             </div>
             <div class={"flex flex-col gap-2"}>
                 <div class={"bg-neutral-800 border border-neutral-700 rounded"}>

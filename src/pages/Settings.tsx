@@ -22,7 +22,7 @@ function Settings() {
         <div class={"p-4 flex flex-col gap-4"}>
             <span class={"text-2xl"}>Settings</span>
 
-            <div class={"flex flex-col gap-2"}>
+            <div class={"flex flex-col gap-2 bg-neutral-800 p-2 rounded w-min border border-neutral-700"}>
                 <span class={"text-lg"}>typing delay range:</span>
                 <div class={"flex gap-2"}>
                     <div class={"flex flex-col"}>
@@ -30,7 +30,7 @@ function Settings() {
                         <input
                             id="lower"
                             type="number"
-                            class={"border-2 not-disabled:border-stone-400 disabled:border-stone-700"}
+                            class={"border-2 border-stone-500 rounded outline-none p-1"}
                             value={lowerDelayBound}
                             onInput={handleLowerTypingDelayChange}
                         />
@@ -40,7 +40,7 @@ function Settings() {
                         <input
                             id="upper"
                             type="number"
-                            class={"border-2 not-disabled:border-stone-400 disabled:border-stone-700"}
+                            class={"border-2 border-stone-500 rounded outline-none p-1"}
                             value={upperDelayBound}
                             onInput={handleUpperTypingDelayChange}
                         />
