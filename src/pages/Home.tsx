@@ -4,6 +4,7 @@ import { useLocked } from "../useLocked";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { listen } from "@tauri-apps/api/event";
 import Loading from "../Loading";
+import { openUrl } from "@tauri-apps/plugin-opener";
 
 function s(time: number) {
     return time !== 1 ? "s" : ""
@@ -41,7 +42,6 @@ function Home() {
     const [progress, setProgress] = useState(0);
     const [timeLeft, setTimeLeft] = useState(0);
     const stageRef = useRef(stage);
-
 
     const hasContents = textToType.length <= 0;
     const locked = useLocked();
@@ -98,7 +98,11 @@ function Home() {
         <div class={"flex flex-col justify-between gap-4 p-4 h-full"}>
             <div class={"flex flex-col"}>
                 <span class={"text-4xl"}>Type It Out</span>
-                <span class={"text-md text-white/70"}>Developed by: mimja</span>
+                <span class={"text-white/70"}>Developed by: mimja</span>
+                <span class={"text-white/70"}>
+                    <span>Enjoying Type It Out? Consider giving it a </span>
+                    <a class={"underline text-blue-400 cursor-pointer"} onClick={() => openUrl("https://github.com/mimja156/type-it-out")}>star on github</a>!
+                </span>
             </div>
             <div class={"flex flex-col gap-2"}>
                 <div class={"bg-neutral-800 border border-neutral-700 rounded"}>
