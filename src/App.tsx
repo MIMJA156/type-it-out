@@ -12,9 +12,11 @@ import Home from "./pages/Home";
 interface AppSettingsStore {
 	upperDelayBound: number,
 	lowerDelayBound: number,
+	deleteTextAfterCompletion: boolean
 
 	setUpperDelayBound: (upper: number) => void,
-	setLowerDelayBound: (lower: number) => void
+	setLowerDelayBound: (lower: number) => void,
+	setDeleteTextAfterCompletion: (choice: boolean) => void,
 };
 
 export const useAppSettings = create<AppSettingsStore>()(
@@ -22,9 +24,11 @@ export const useAppSettings = create<AppSettingsStore>()(
 		(set) => ({
 			upperDelayBound: 100,
 			lowerDelayBound: 50,
+			deleteTextAfterCompletion: false,
 
 			setUpperDelayBound: (upper) => set(() => ({ upperDelayBound: upper })),
-			setLowerDelayBound: (lower) => set(() => ({ lowerDelayBound: lower }))
+			setLowerDelayBound: (lower) => set(() => ({ lowerDelayBound: lower })),
+			setDeleteTextAfterCompletion: (choice) => set(() => ({ deleteTextAfterCompletion: choice })),
 		}),
 		{ name: "app-settings", version: 1 }
 	)

@@ -33,6 +33,7 @@ type TypingThreadProgress = {
 function Home() {
     const upperDelayBound = useAppSettings((state) => state.upperDelayBound);
     const lowerDelayBound = useAppSettings((state) => state.lowerDelayBound);
+    const deleteTextAfterCompletion = useAppSettings((state) => state.deleteTextAfterCompletion);
 
     const textToType = useAppState((state) => state.textToType);
     const setTextToType = useAppState((state) => state.setTextToType);
@@ -77,7 +78,10 @@ function Home() {
             setProgress(packet.progress);
             setTimeLeft(packet.timeLeft);
 
-            if (packet.progress === 1) setStage("finished");
+            if (packet.progress === 1) {
+                if (deleteTextAfterCompletion) setTextToType("");
+                setStage("finished");
+            }
         });
 
         let unListenStartedTyping = listen("started-typing", () => setStage("typing"));

@@ -1,10 +1,14 @@
+import { event } from "@tauri-apps/api";
 import { useAppSettings } from "../App";
 
 function Settings() {
     const upperDelayBound = useAppSettings((state) => state.upperDelayBound);
     const lowerDelayBound = useAppSettings((state) => state.lowerDelayBound);
+    const deleteTextAfterCompletion = useAppSettings((state) => state.deleteTextAfterCompletion);
+
     const setUpperDelayBound = useAppSettings((state) => state.setUpperDelayBound);
     const setLowerDelayBound = useAppSettings((state) => state.setLowerDelayBound);
+    const setDeleteTextAfterCompletion = useAppSettings((state) => state.setDeleteTextAfterCompletion);
 
     const handleUpperTypingDelayChange = (event: InputEvent) => {
         if (!event.target) return;
@@ -16,6 +20,10 @@ function Settings() {
         if (!event.target) return;
         let target = event.target as HTMLInputElement;
         setLowerDelayBound(Number(target.value));
+    };
+
+    const handleDeleteTextAfterCompletionChange = () => {
+        setDeleteTextAfterCompletion(!deleteTextAfterCompletion);
     };
 
     return (
@@ -45,6 +53,19 @@ function Settings() {
                             onInput={handleUpperTypingDelayChange}
                         />
                     </div>
+                </div>
+            </div>
+            <div class={"flex flex-row gap-3 items-center bg-neutral-800 p-2 rounded w-min border border-neutral-700"}>
+                <label for="delete-after" class={"text-lg whitespace-nowrap"}>delete text after typing:</label>
+                <div class={"flex flex-row gap-2 items-center"}>
+                    <input
+                        class={"w-5 h-5 cursor-pointer"}
+                        id="delete-after"
+                        type="checkbox"
+                        checked={deleteTextAfterCompletion}
+                        onInput={handleDeleteTextAfterCompletionChange}
+                    />
+                    {deleteTextAfterCompletion ? "Yes" : "No"}
                 </div>
             </div>
         </div>
