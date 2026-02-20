@@ -56,7 +56,7 @@ function Settings() {
                 </div>
             </div>
             <div class={"flex flex-row gap-3 items-center bg-neutral-800 p-2 rounded w-min border border-neutral-700"}>
-                <label for="delete-after" class={"text-lg whitespace-nowrap"}>delete text after typing:</label>
+                <label for="delete-after" class={"text-lg whitespace-nowrap"}>clear text area after typing:</label>
                 <div class={"flex flex-row gap-2 items-center"}>
                     <input
                         class={"w-5 h-5 cursor-pointer"}
