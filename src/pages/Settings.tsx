@@ -1,4 +1,3 @@
-import { event } from "@tauri-apps/api";
 import { useAppSettings } from "../App";
 
 function Settings() {
