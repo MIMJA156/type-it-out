@@ -22,14 +22,14 @@ struct TypingThreadPacket {
 
 struct TypingThreadChar {
     char: char,
-    wait: u64
+    wait: u64,
 }
 
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct TypingThreadProgress {
     progress: f32,
-    time_left: u32
+    time_left: u32,
 }
 
 struct AppData {
@@ -120,10 +120,13 @@ pub fn run() {
                             queue.push_back(TypingThreadChar { char, wait });
                         }
 
-                        _ = keyboard_emulator_handle.emit("progress-typing", TypingThreadProgress {
-                            progress: 0.0,
-                            time_left: total_time as u32
-                        });
+                        _ = keyboard_emulator_handle.emit(
+                            "progress-typing",
+                            TypingThreadProgress {
+                                progress: 0.0,
+                                time_left: total_time as u32,
+                            },
+                        );
 
                         'inner: while !queue.is_empty() {
                             if stop_typing_flag.load(Ordering::Relaxed) {
@@ -137,10 +140,13 @@ pub fn run() {
                                 time_passed += char.wait;
                             }
 
-                            _ = keyboard_emulator_handle.emit("progress-typing", TypingThreadProgress {
-                                progress: 1.0 - (queue.len() as f32 / total_size as f32),
-                                time_left: (total_time - time_passed) as u32
-                            });
+                            _ = keyboard_emulator_handle.emit(
+                                "progress-typing",
+                                TypingThreadProgress {
+                                    progress: 1.0 - (queue.len() as f32 / total_size as f32),
+                                    time_left: (total_time - time_passed) as u32,
+                                },
+                            );
                         }
 
                         stop_typing_flag.store(false, Ordering::Relaxed);

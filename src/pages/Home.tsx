@@ -7,7 +7,7 @@ import Loading from "../Loading";
 import { openUrl } from "@tauri-apps/plugin-opener";
 
 function s(time: number) {
-    return time !== 1 ? "s" : ""
+    return time !== 1 ? "s" : "";
 }
 
 function format(ms: number) {
@@ -16,7 +16,7 @@ function format(ms: number) {
     let seconds = Math.floor(ms / 1000);
     if (seconds > 60) {
         let minutes = Math.floor(seconds / 60);
-        let remainingSeconds = (seconds - minutes * 60);
+        let remainingSeconds = seconds - minutes * 60;
 
         if (minutes > 60) return "over an hour";
         return `${minutes} minute${s(minutes)} and ${remainingSeconds} second${s(remainingSeconds)}`;
@@ -26,8 +26,8 @@ function format(ms: number) {
 }
 
 type TypingThreadProgress = {
-    progress: number,
-    timeLeft: number
+    progress: number;
+    timeLeft: number;
 };
 
 function Home() {
@@ -58,7 +58,7 @@ function Home() {
         invoke("start_watcher", {
             toType: textToType,
             upperDelay: upperDelayBound,
-            lowerDelay: lowerDelayBound
+            lowerDelay: lowerDelayBound,
         });
     };
 
@@ -92,9 +92,9 @@ function Home() {
         });
 
         return () => {
-            unListenStartedTyping.then(f => f());
-            unListenTypingProgress.then(f => f());
-            unListenTypingCancel.then(f => f());
+            unListenStartedTyping.then((f) => f());
+            unListenTypingProgress.then((f) => f());
+            unListenTypingCancel.then((f) => f());
         };
     }, []);
 
@@ -105,7 +105,13 @@ function Home() {
                 <span class={"text-white/70"}>Developed by: mimja</span>
                 <span class={"text-white/70"}>
                     <span>Enjoying Type It Out? Consider giving it a </span>
-                    <a class={"underline text-blue-400 cursor-pointer"} onClick={() => openUrl("https://github.com/mimja156/type-it-out")}>star on github</a>!
+                    <a
+                        class={"underline text-blue-400 cursor-pointer"}
+                        onClick={() => openUrl("https://github.com/mimja156/type-it-out")}
+                    >
+                        star on github
+                    </a>
+                    !
                 </span>
             </div>
             <div class={"flex flex-col gap-2"}>
@@ -121,14 +127,18 @@ function Home() {
 
                 <div class={"flex flex-row gap-2"}>
                     <button
-                        class={"px-4 py-2 border border-stone-400 not-disabled:cursor-pointer bg-stone-700 not-disabled:hover:bg-stone-700/70 disabled:brightness-75 rounded"}
+                        class={
+                            "px-4 py-2 border border-stone-400 not-disabled:cursor-pointer bg-stone-700 not-disabled:hover:bg-stone-700/70 disabled:brightness-75 rounded"
+                        }
                         disabled={hasContents || locked}
                         onClick={startTyping}
                     >
                         Start Watching
                     </button>
                     <button
-                        class={"px-4 py-2 border border-stone-400 not-disabled:cursor-pointer bg-stone-700 not-disabled:hover:bg-stone-700/70 disabled:brightness-75 rounded"}
+                        class={
+                            "px-4 py-2 border border-stone-400 not-disabled:cursor-pointer bg-stone-700 not-disabled:hover:bg-stone-700/70 disabled:brightness-75 rounded"
+                        }
                         disabled={hasContents || !locked}
                         onClick={stopTyping}
                     >
@@ -136,15 +146,15 @@ function Home() {
                     </button>
 
                     <div class={"flex items-end ml-2"}>
-                        {stage === "watching" &&
+                        {stage === "watching" && (
                             <Loading
                                 text="watching for start key (right control)"
                                 frames={[".", "..", "...", "....", "....."]}
                                 delay={250}
                             />
-                        }
+                        )}
 
-                        {stage === "typing" &&
+                        {stage === "typing" && (
                             <div class={"flex flex-col"}>
                                 <div class={"flex items-center gap-2"}>
                                     <progress value={progress} class={"w-64"} />
@@ -152,7 +162,7 @@ function Home() {
                                 </div>
                                 <span class={"text-sm"}>time left: {format(timeLeft)}</span>
                             </div>
-                        }
+                        )}
 
                         {stage === "finished" && <span>finished typing</span>}
                         {stage === "cancelled" && <span>typing aborted</span>}
@@ -160,7 +170,7 @@ function Home() {
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 export default Home;

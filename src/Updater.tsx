@@ -47,14 +47,14 @@ function Updater() {
         <main class={"w-screen h-screen bg-neutral-900 text-white/80"}>
             {ui === "completed" && <App />}
 
-            {ui === "checking" &&
+            {ui === "checking" && (
                 <div class="h-full flex flex-col justify-center items-center">
                     <Loader2 class={"animate-spin"} size={32} />
                     <span>checking for updates</span>
                 </div>
-            }
+            )}
 
-            {ui === "updating" &&
+            {ui === "updating" && (
                 <div class="h-full flex flex-col justify-center items-center">
                     <Loading
                         text="update found! updating app to latest version"
@@ -62,7 +62,7 @@ function Updater() {
                         delay={250}
                     />
                 </div>
-            }
+            )}
         </main>
     );
 }

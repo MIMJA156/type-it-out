@@ -1,47 +1,39 @@
 {
-  "$schema": "https://schema.tauri.app/config/2",
-  "productName": "type-it-out",
-  "version": "0.2.6",
-  "identifier": "com.mimja.type-it-out",
-  "build": {
-    "beforeDevCommand": "npm run dev",
-    "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm run build",
-    "frontendDist": "../dist"
-  },
-  "app": {
-    "windows": [
-      {
-        "title": "type-it-out",
-        "width": 800,
-        "height": 440,
-        "backgroundColor": "#171717",
-        "resizable": false,
-        "maximizable": false
-      }
-    ],
-    "security": {
-      "csp": null
+    "$schema": "https://schema.tauri.app/config/2",
+    "productName": "type-it-out",
+    "version": "0.2.6",
+    "identifier": "com.mimja.type-it-out",
+    "build": {
+        "beforeDevCommand": "npm run dev",
+        "devUrl": "http://localhost:1420",
+        "beforeBuildCommand": "npm run build",
+        "frontendDist": "../dist"
+    },
+    "app": {
+        "windows": [
+            {
+                "title": "type-it-out",
+                "width": 800,
+                "height": 440,
+                "backgroundColor": "#171717",
+                "resizable": false,
+                "maximizable": false
+            }
+        ],
+        "security": {
+            "csp": null
+        }
+    },
+    "bundle": {
+        "createUpdaterArtifacts": true,
+        "active": true,
+        "targets": "nsis",
+        "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"]
+    },
+    "plugins": {
+        "updater": {
+            "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEMwMDZEQ0ExQjE3Qzc1NEIKUldSTGRYeXhvZHdHd0c4MjhwdEJLVmpwbHptcmxybDd3TVF1MXAzVXVYZVlZQ2RoSDFrSjZyK3cK",
+            "endpoints": ["https://github.com/mimja156/type-it-out/releases/latest/download/updater.json"]
+        }
     }
-  },
-  "bundle": {
-    "createUpdaterArtifacts": true,
-    "active": true,
-    "targets": "nsis",
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ]
-  },
-  "plugins": {
-    "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEMwMDZEQ0ExQjE3Qzc1NEIKUldSTGRYeXhvZHdHd0c4MjhwdEJLVmpwbHptcmxybDd3TVF1MXAzVXVYZVlZQ2RoSDFrSjZyK3cK",
-      "endpoints": [
-        "https://github.com/mimja156/type-it-out/releases/latest/download/updater.json"
-      ]
-    }
-  }
 }
