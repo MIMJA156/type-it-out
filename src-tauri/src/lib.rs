@@ -149,6 +149,14 @@ pub fn run() {
                             );
                         }
 
+                        _ = keyboard_emulator_handle.emit(
+                            "progress-typing",
+                            TypingThreadProgress {
+                                progress: 1.0,
+                                time_left: 0,
+                            },
+                        );
+
                         stop_typing_flag.store(false, Ordering::Relaxed);
                     }
                 }
