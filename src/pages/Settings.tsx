@@ -1,4 +1,6 @@
+import { RotateCcw } from "lucide-preact";
 import { useAppSettings } from "../App";
+import { ask } from "@tauri-apps/plugin-dialog";
 
 function Settings() {
     const upperDelayBound = useAppSettings((state) => state.upperDelayBound);
@@ -8,6 +10,8 @@ function Settings() {
     const setUpperDelayBound = useAppSettings((state) => state.setUpperDelayBound);
     const setLowerDelayBound = useAppSettings((state) => state.setLowerDelayBound);
     const setDeleteTextAfterCompletion = useAppSettings((state) => state.setDeleteTextAfterCompletion);
+
+    const resetDelayBounds = useAppSettings((state) => state.resetDelayBounds);
 
     const handleUpperTypingDelayChange = (event: InputEvent) => {
         if (!event.target) return;
@@ -25,12 +29,22 @@ function Settings() {
         setDeleteTextAfterCompletion(!deleteTextAfterCompletion);
     };
 
+    const handleDelayBoundsReset = async () => {
+        const answer = await ask("This cannot be undone. Are you sure?", { title: "alert", kind: "warning" });
+        if (answer) resetDelayBounds();
+    };
+
     return (
         <div class={"p-4 flex flex-col gap-4"}>
             <span class={"text-2xl"}>Settings</span>
 
             <div class={"flex flex-col gap-2 bg-neutral-800 p-2 rounded w-min border border-neutral-700"}>
-                <span class={"text-lg"}>typing delay range:</span>
+                <div class={"flex w-full justify-between items-center"}>
+                    <span class={"text-lg"}>typing delay range:</span>
+                    <button class={"cursor-pointer pr-1"} onClick={handleDelayBoundsReset}>
+                        <RotateCcw size={"20"} />
+                    </button>
+                </div>
                 <div class={"flex gap-2"}>
                     <div class={"flex flex-col"}>
                         <label for="lower">lower (ms)</label>

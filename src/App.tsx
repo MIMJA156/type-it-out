@@ -9,6 +9,12 @@ import Settings from "./pages/Settings";
 import Help from "./pages/Help";
 import Home from "./pages/Home";
 
+const defaultAppState = {
+    upperDelayBound: 100,
+    lowerDelayBound: 50,
+    deleteTextAfterCompletion: false
+};
+
 interface AppSettingsStore {
     upperDelayBound: number;
     lowerDelayBound: number;
@@ -17,18 +23,22 @@ interface AppSettingsStore {
     setUpperDelayBound: (upper: number) => void;
     setLowerDelayBound: (lower: number) => void;
     setDeleteTextAfterCompletion: (choice: boolean) => void;
+
+    resetDelayBounds: () => void;
 }
 
 export const useAppSettings = create<AppSettingsStore>()(
     persist(
         (set) => ({
-            upperDelayBound: 100,
-            lowerDelayBound: 50,
-            deleteTextAfterCompletion: false,
+            upperDelayBound: defaultAppState.upperDelayBound,
+            lowerDelayBound: defaultAppState.lowerDelayBound,
+            deleteTextAfterCompletion: defaultAppState.deleteTextAfterCompletion,
 
             setUpperDelayBound: (upper) => set(() => ({ upperDelayBound: upper })),
             setLowerDelayBound: (lower) => set(() => ({ lowerDelayBound: lower })),
             setDeleteTextAfterCompletion: (choice) => set(() => ({ deleteTextAfterCompletion: choice })),
+
+            resetDelayBounds: () => set(() => ({ upperDelayBound: defaultAppState.upperDelayBound, lowerDelayBound: defaultAppState.lowerDelayBound }))
         }),
         { name: "app-settings", version: 1 },
     ),
