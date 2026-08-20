@@ -34,6 +34,7 @@ function Home() {
     const upperDelayBound = useAppSettings((state) => state.upperDelayBound);
     const lowerDelayBound = useAppSettings((state) => state.lowerDelayBound);
     const deleteTextAfterCompletion = useAppSettings((state) => state.deleteTextAfterCompletion);
+    const imitateHumanHesitation = useAppSettings((state) => state.imitateHumanHesitation);
 
     const textToType = useAppState((state) => state.textToType);
     const setTextToType = useAppState((state) => state.setTextToType);
@@ -59,6 +60,7 @@ function Home() {
             toType: textToType,
             upperDelay: upperDelayBound,
             lowerDelay: lowerDelayBound,
+            imitateHumanHesitation
         });
     };
 

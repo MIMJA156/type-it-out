@@ -6,10 +6,12 @@ function Settings() {
     const upperDelayBound = useAppSettings((state) => state.upperDelayBound);
     const lowerDelayBound = useAppSettings((state) => state.lowerDelayBound);
     const deleteTextAfterCompletion = useAppSettings((state) => state.deleteTextAfterCompletion);
+    const imitateHumanHesitation = useAppSettings((state) => state.imitateHumanHesitation);
 
     const setUpperDelayBound = useAppSettings((state) => state.setUpperDelayBound);
     const setLowerDelayBound = useAppSettings((state) => state.setLowerDelayBound);
     const setDeleteTextAfterCompletion = useAppSettings((state) => state.setDeleteTextAfterCompletion);
+    const setImitateHumanHesitation = useAppSettings((state) => state.setImitateHumanHesitation);
 
     const resetDelayBounds = useAppSettings((state) => state.resetDelayBounds);
 
@@ -29,6 +31,10 @@ function Settings() {
         setDeleteTextAfterCompletion(!deleteTextAfterCompletion);
     };
 
+    const handleImitateHumanHesitationChange = () => {
+        setImitateHumanHesitation(!imitateHumanHesitation);
+    };
+
     const handleDelayBoundsReset = async () => {
         const answer = await ask("This cannot be undone. Are you sure?", { title: "alert", kind: "warning" });
         if (answer) resetDelayBounds();
@@ -38,6 +44,7 @@ function Settings() {
         <div class={"p-4 flex flex-col gap-4"}>
             <span class={"text-2xl"}>Settings</span>
 
+            {/* Delay Range */}
             <div class={"flex flex-col gap-2 bg-neutral-800 p-2 rounded w-min border border-neutral-700"}>
                 <div class={"flex w-full justify-between items-center"}>
                     <span class={"text-lg"}>typing delay range:</span>
@@ -68,6 +75,8 @@ function Settings() {
                     </div>
                 </div>
             </div>
+
+            {/* clear text after finish */}
             <div class={"flex flex-row gap-3 items-center bg-neutral-800 p-2 rounded w-min border border-neutral-700"}>
                 <label for="delete-after" class={"text-lg whitespace-nowrap"}>
                     clear text area after typing:
@@ -81,6 +90,23 @@ function Settings() {
                         onInput={handleDeleteTextAfterCompletionChange}
                     />
                     {deleteTextAfterCompletion ? "Yes" : "No"}
+                </div>
+            </div>
+
+            {/* imitate human hesitation */}
+            <div class={"flex flex-row gap-3 items-center bg-neutral-800 p-2 rounded w-min border border-neutral-700"}>
+                <label for="delete-after" class={"text-lg whitespace-nowrap"}>
+                    imitate human hesitation:
+                </label>
+                <div class={"flex flex-row gap-2 items-center"}>
+                    <input
+                        class={"w-5 h-5 cursor-pointer"}
+                        id="imitate-human-hesitation"
+                        type="checkbox"
+                        checked={imitateHumanHesitation}
+                        onInput={handleImitateHumanHesitationChange}
+                    />
+                    {imitateHumanHesitation ? "Yes" : "No"}
                 </div>
             </div>
         </div>

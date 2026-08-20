@@ -12,17 +12,20 @@ import Home from "./pages/Home";
 const defaultAppState = {
     upperDelayBound: 100,
     lowerDelayBound: 50,
-    deleteTextAfterCompletion: false
+    deleteTextAfterCompletion: false,
+    imitateHumanHesitation: false
 };
 
 interface AppSettingsStore {
     upperDelayBound: number;
     lowerDelayBound: number;
     deleteTextAfterCompletion: boolean;
+    imitateHumanHesitation: boolean;
 
     setUpperDelayBound: (upper: number) => void;
     setLowerDelayBound: (lower: number) => void;
     setDeleteTextAfterCompletion: (choice: boolean) => void;
+    setImitateHumanHesitation: (choice: boolean) => void;
 
     resetDelayBounds: () => void;
 }
@@ -33,10 +36,12 @@ export const useAppSettings = create<AppSettingsStore>()(
             upperDelayBound: defaultAppState.upperDelayBound,
             lowerDelayBound: defaultAppState.lowerDelayBound,
             deleteTextAfterCompletion: defaultAppState.deleteTextAfterCompletion,
+            imitateHumanHesitation: defaultAppState.imitateHumanHesitation,
 
             setUpperDelayBound: (upper) => set(() => ({ upperDelayBound: upper })),
             setLowerDelayBound: (lower) => set(() => ({ lowerDelayBound: lower })),
             setDeleteTextAfterCompletion: (choice) => set(() => ({ deleteTextAfterCompletion: choice })),
+            setImitateHumanHesitation: (choice) => set(() => ({ imitateHumanHesitation: choice })),
 
             resetDelayBounds: () => set(() => ({ upperDelayBound: defaultAppState.upperDelayBound, lowerDelayBound: defaultAppState.lowerDelayBound }))
         }),
@@ -98,12 +103,12 @@ function App() {
                         />
                     </button>
 
-                    {/* <button onClick={() => setUi("help")} disabled={locked} >
+                     {/*<button onClick={() => setUi("help")} disabled={locked} >
 						<LucideCircleQuestionMark
 							size={"36px"}
 							class={`${ui === "help" ? "stroke-zinc-200" : "stroke-zinc-400"} cursor-pointer`}
 						/>
-					</button> */}
+					</button>*/}
                 </div>
                 <span class={"mb-2"}>v{version}</span>
             </div>

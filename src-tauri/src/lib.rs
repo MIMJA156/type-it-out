@@ -4,6 +4,7 @@ use rdev::listen;
 use serde::Serialize;
 use std::{
     collections::VecDeque,
+    println,
     sync::{
         atomic::{AtomicBool, Ordering},
         mpsc::{self, Receiver, Sender},
@@ -18,6 +19,7 @@ struct TypingThreadPacket {
     target: String,
     upper: u64,
     lower: u64,
+    imitate_human_hesitation: bool,
 }
 
 struct TypingThreadChar {
@@ -34,10 +36,15 @@ struct TypingThreadProgress {
 
 struct AppData {
     watching_for_activation_key: bool,
-    string_to_type: Option<String>,
-    character_delay_range: Option<(u64, u64)>,
     stop_typing_flag: Arc<AtomicBool>,
+
+    string_to_type: Option<String>,
+
+    character_delay_range: Option<(u64, u64)>,
+    imitate_human_hesitation: Option<bool>,
 }
+
+const HUMAN_HESITATION_PERCENT_ADDITION: u64 = 25; // represents a percentage. IE: 0 to 100
 
 #[tauri::command]
 fn start_watcher(
@@ -45,12 +52,14 @@ fn start_watcher(
     to_type: String,
     lower_delay: u64,
     upper_delay: u64,
+    imitate_human_hesitation: bool,
 ) {
     let mut state = state.lock().unwrap();
     state.stop_typing_flag.store(false, Ordering::Relaxed);
     state.string_to_type = Some(to_type);
     state.character_delay_range = Some((lower_delay, upper_delay));
     state.watching_for_activation_key = true;
+    state.imitate_human_hesitation = Some(imitate_human_hesitation);
 }
 
 #[tauri::command]
@@ -73,9 +82,10 @@ pub fn run() {
         .plugin(tauri_plugin_updater::Builder::new().build())
         .manage(Mutex::new(AppData {
             watching_for_activation_key: false,
+            stop_typing_flag: stop_typing_flag.clone(),
             string_to_type: None,
             character_delay_range: None,
-            stop_typing_flag: stop_typing_flag.clone(),
+            imitate_human_hesitation: None,
         }))
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![start_watcher, abort_current])
@@ -113,9 +123,20 @@ pub fn run() {
                         let mut total_time = 0;
                         let mut time_passed = 0;
 
+                        let chars: Vec<char> = packet.target.chars().collect();
                         let mut queue: VecDeque<TypingThreadChar> = VecDeque::new();
-                        for char in packet.target.chars() {
-                            let wait = rng.random_range(packet.lower..(packet.upper + 1));
+
+                        for (i, char) in packet.target.chars().enumerate() {
+                            let mut wait = rng.random_range(packet.lower..(packet.upper + 1));
+
+                            if packet.imitate_human_hesitation && i > 0 && i < usize::MAX {
+                                if chars.get(i - 1).is_some_and(|c| c.is_alphanumeric())
+                                    && chars.get(i + 1).is_some_and(|c| c.is_alphanumeric())
+                                {
+                                    wait += (wait / 100) * HUMAN_HESITATION_PERCENT_ADDITION;
+                                }
+                            }
+
                             total_time += wait;
                             total_size += 1;
                             queue.push_back(TypingThreadChar { char, wait });
@@ -172,13 +193,16 @@ pub fn run() {
                     state.watching_for_activation_key = false;
                     start_listen_handler.emit("started-typing", ()).unwrap();
 
-                    if let (Some(str), Some(range)) =
-                        (&state.string_to_type, &state.character_delay_range)
-                    {
+                    if let (Some(str), Some(range), Some(imitate_human_hesitation)) = (
+                        &state.string_to_type,
+                        &state.character_delay_range,
+                        state.imitate_human_hesitation,
+                    ) {
                         _ = typing_packet_sender.send(TypingThreadPacket {
                             target: str.clone(),
                             lower: range.0,
                             upper: range.1,
+                            imitate_human_hesitation,
                         });
                     }
                 }
