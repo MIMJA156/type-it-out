@@ -1,6 +1,6 @@
 [package]
 name = "type-it-out"
-version = "0.2.7"
+version = "0.3.0"
 description = "A Tauri App"
 authors = ["you"]
 edition = "2021"
