@@ -44,7 +44,7 @@ struct AppData {
     imitate_human_hesitation: Option<bool>,
 }
 
-const HUMAN_HESITATION_PERCENT_ADDITION: u64 = 25; // represents a percentage. IE: 0 to 100
+const HUMAN_HESITATION_PERCENT_ADDITION: f64 = 25.0; // represents a percentage. Can be over 100%.
 
 #[tauri::command]
 fn start_watcher(
@@ -128,12 +128,13 @@ pub fn run() {
 
                         for (i, char) in packet.target.chars().enumerate() {
                             let mut wait = rng.random_range(packet.lower..(packet.upper + 1));
-
                             if packet.imitate_human_hesitation && i > 0 && i < usize::MAX {
                                 if chars.get(i - 1).is_some_and(|c| c.is_alphanumeric())
                                     && chars.get(i + 1).is_some_and(|c| c.is_alphanumeric())
                                 {
-                                    wait += (wait / 100) * HUMAN_HESITATION_PERCENT_ADDITION;
+                                    let gain =
+                                        (wait as f64 / 100.0) * HUMAN_HESITATION_PERCENT_ADDITION;
+                                    wait += gain as u64;
                                 }
                             }
 
