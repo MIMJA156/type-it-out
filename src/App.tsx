@@ -1,10 +1,11 @@
 import { getVersion } from "@tauri-apps/api/app";
-import { LucideHome, LucideSettings } from "lucide-preact";
+import { LucideBrainCircuit, LucideHome, LucideSettings } from "lucide-preact";
 import { useEffect, useState } from "preact/hooks";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import Help from "./pages/Help";
 import Home from "./pages/Home";
+import Research from "./pages/Research";
 import Settings from "./pages/Settings";
 import { useLocked } from "./useLocked";
 
@@ -71,7 +72,7 @@ export const useAppState = create<AppStateStore>((set) => ({
 
 function App() {
 	const [version, setVersion] = useState("0.0.0");
-	const [ui, setUi] = useState<"home" | "settings" | "help">("home");
+	const [ui, setUi] = useState<"home" | "settings" | "research" | "help">("home");
 	const locked = useLocked();
 
 	useEffect(() => {
@@ -110,6 +111,18 @@ function App() {
 						/>
 					</button>
 
+					<button
+						type={"button"}
+						onClick={() => setUi("research")}
+						disabled={locked}
+						class={"not-disabled:cursor-pointer"}
+					>
+						<LucideBrainCircuit
+							size={"36px"}
+							class={ui === "research" ? "stroke-zinc-200" : `${locked ? "stroke-zinc-600" : "stroke-zinc-400"}`}
+						/>
+					</button>
+
 					{/*<button onClick={() => setUi("help")} disabled={locked} >
 						<LucideCircleQuestionMark
 							size={"36px"}
@@ -122,6 +135,7 @@ function App() {
 			<div>
 				{ui === "home" && <Home />}
 				{ui === "settings" && <Settings />}
+				{ui === "research" && <Research />}
 				{ui === "help" && <Help />}
 			</div>
 		</div>
