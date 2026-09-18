@@ -1,116 +1,121 @@
+import { ask } from "@tauri-apps/plugin-dialog";
 import { RotateCcw } from "lucide-preact";
 import { useAppSettings } from "../App";
-import { ask } from "@tauri-apps/plugin-dialog";
 
 function Settings() {
-    const upperDelayBound = useAppSettings((state) => state.upperDelayBound);
-    const lowerDelayBound = useAppSettings((state) => state.lowerDelayBound);
-    const deleteTextAfterCompletion = useAppSettings((state) => state.deleteTextAfterCompletion);
-    const imitateHumanHesitation = useAppSettings((state) => state.imitateHumanHesitation);
+	const upperDelayBound = useAppSettings((state) => state.upperDelayBound);
+	const lowerDelayBound = useAppSettings((state) => state.lowerDelayBound);
+	const deleteTextAfterCompletion = useAppSettings((state) => state.deleteTextAfterCompletion);
+	const imitateHumanHesitation = useAppSettings((state) => state.imitateHumanHesitation);
 
-    const setUpperDelayBound = useAppSettings((state) => state.setUpperDelayBound);
-    const setLowerDelayBound = useAppSettings((state) => state.setLowerDelayBound);
-    const setDeleteTextAfterCompletion = useAppSettings((state) => state.setDeleteTextAfterCompletion);
-    const setImitateHumanHesitation = useAppSettings((state) => state.setImitateHumanHesitation);
+	const setUpperDelayBound = useAppSettings((state) => state.setUpperDelayBound);
+	const setLowerDelayBound = useAppSettings((state) => state.setLowerDelayBound);
+	const setDeleteTextAfterCompletion = useAppSettings((state) => state.setDeleteTextAfterCompletion);
+	const setImitateHumanHesitation = useAppSettings((state) => state.setImitateHumanHesitation);
 
-    const resetDelayBounds = useAppSettings((state) => state.resetDelayBounds);
+	const resetDelayBounds = useAppSettings((state) => state.resetDelayBounds);
 
-    const handleUpperTypingDelayChange = (event: InputEvent) => {
-        if (!event.target) return;
-        let target = event.target as HTMLInputElement;
-        setUpperDelayBound(Number(target.value));
-    };
+	const handleUpperTypingDelayChange = (event: InputEvent) => {
+		if (!event.target) return;
+		const target = event.target as HTMLInputElement;
+		setUpperDelayBound(Number(target.value));
+	};
 
-    const handleLowerTypingDelayChange = (event: InputEvent) => {
-        if (!event.target) return;
-        let target = event.target as HTMLInputElement;
-        setLowerDelayBound(Number(target.value));
-    };
+	const handleLowerTypingDelayChange = (event: InputEvent) => {
+		if (!event.target) return;
+		const target = event.target as HTMLInputElement;
+		setLowerDelayBound(Number(target.value));
+	};
 
-    const handleDeleteTextAfterCompletionChange = () => {
-        setDeleteTextAfterCompletion(!deleteTextAfterCompletion);
-    };
+	const handleDeleteTextAfterCompletionChange = () => setDeleteTextAfterCompletion(!deleteTextAfterCompletion);
+	const handleImitateHumanHesitationChange = () => setImitateHumanHesitation(!imitateHumanHesitation);
 
-    const handleImitateHumanHesitationChange = () => {
-        setImitateHumanHesitation(!imitateHumanHesitation);
-    };
+	const handleDelayBoundsReset = async () => {
+		const answer = await ask("This cannot be undone. Are you sure?", { title: "alert", kind: "warning" });
+		if (answer) resetDelayBounds();
+	};
 
-    const handleDelayBoundsReset = async () => {
-        const answer = await ask("This cannot be undone. Are you sure?", { title: "alert", kind: "warning" });
-        if (answer) resetDelayBounds();
-    };
+	return (
+		<div class={"p-4 flex flex-col gap-4"}>
+			<span class={"text-2xl"}>Settings</span>
 
-    return (
-        <div class={"p-4 flex flex-col gap-4"}>
-            <span class={"text-2xl"}>Settings</span>
+			{/* Delay Range */}
+			<div class={"flex flex-col gap-2 bg-neutral-800 p-2 rounded w-min border border-neutral-700"}>
+				<div class={"flex w-full justify-between items-center"}>
+					<span class={"text-lg"}>typing delay range:</span>
+					<button
+						type={"button"}
+						class={"cursor-pointer pr-1"}
+						onClick={handleDelayBoundsReset}
+					>
+						<RotateCcw size={"20"} />
+					</button>
+				</div>
+				<div class={"flex gap-2"}>
+					<div class={"flex flex-col"}>
+						<label for="lower">lower (ms)</label>
+						<input
+							id="lower"
+							type="number"
+							class={"border-2 border-stone-500 rounded outline-none p-1"}
+							value={lowerDelayBound}
+							onInput={handleLowerTypingDelayChange}
+						/>
+					</div>
+					<div class={"flex flex-col"}>
+						<label for="upper">upper (ms)</label>
+						<input
+							id="upper"
+							type="number"
+							class={"border-2 border-stone-500 rounded outline-none p-1"}
+							value={upperDelayBound}
+							onInput={handleUpperTypingDelayChange}
+						/>
+					</div>
+				</div>
+			</div>
 
-            {/* Delay Range */}
-            <div class={"flex flex-col gap-2 bg-neutral-800 p-2 rounded w-min border border-neutral-700"}>
-                <div class={"flex w-full justify-between items-center"}>
-                    <span class={"text-lg"}>typing delay range:</span>
-                    <button class={"cursor-pointer pr-1"} onClick={handleDelayBoundsReset}>
-                        <RotateCcw size={"20"} />
-                    </button>
-                </div>
-                <div class={"flex gap-2"}>
-                    <div class={"flex flex-col"}>
-                        <label for="lower">lower (ms)</label>
-                        <input
-                            id="lower"
-                            type="number"
-                            class={"border-2 border-stone-500 rounded outline-none p-1"}
-                            value={lowerDelayBound}
-                            onInput={handleLowerTypingDelayChange}
-                        />
-                    </div>
-                    <div class={"flex flex-col"}>
-                        <label for="upper">upper (ms)</label>
-                        <input
-                            id="upper"
-                            type="number"
-                            class={"border-2 border-stone-500 rounded outline-none p-1"}
-                            value={upperDelayBound}
-                            onInput={handleUpperTypingDelayChange}
-                        />
-                    </div>
-                </div>
-            </div>
+			{/* clear text after finish */}
+			<div class={"flex flex-row gap-3 items-center bg-neutral-800 p-2 rounded w-min border border-neutral-700"}>
+				<label
+					for="delete-after"
+					class={"text-lg whitespace-nowrap"}
+				>
+					clear text area after typing:
+				</label>
+				<div class={"flex flex-row gap-2 items-center"}>
+					<input
+						class={"w-5 h-5 cursor-pointer"}
+						id="delete-after"
+						type="checkbox"
+						checked={deleteTextAfterCompletion}
+						onInput={handleDeleteTextAfterCompletionChange}
+					/>
+					{deleteTextAfterCompletion ? "Yes" : "No"}
+				</div>
+			</div>
 
-            {/* clear text after finish */}
-            <div class={"flex flex-row gap-3 items-center bg-neutral-800 p-2 rounded w-min border border-neutral-700"}>
-                <label for="delete-after" class={"text-lg whitespace-nowrap"}>
-                    clear text area after typing:
-                </label>
-                <div class={"flex flex-row gap-2 items-center"}>
-                    <input
-                        class={"w-5 h-5 cursor-pointer"}
-                        id="delete-after"
-                        type="checkbox"
-                        checked={deleteTextAfterCompletion}
-                        onInput={handleDeleteTextAfterCompletionChange}
-                    />
-                    {deleteTextAfterCompletion ? "Yes" : "No"}
-                </div>
-            </div>
-
-            {/* imitate human hesitation */}
-            <div class={"flex flex-row gap-3 items-center bg-neutral-800 p-2 rounded w-min border border-neutral-700"}>
-                <label for="delete-after" class={"text-lg whitespace-nowrap"}>
-                    imitate human hesitation:
-                </label>
-                <div class={"flex flex-row gap-2 items-center"}>
-                    <input
-                        class={"w-5 h-5 cursor-pointer"}
-                        id="imitate-human-hesitation"
-                        type="checkbox"
-                        checked={imitateHumanHesitation}
-                        onInput={handleImitateHumanHesitationChange}
-                    />
-                    {imitateHumanHesitation ? "Yes" : "No"}
-                </div>
-            </div>
-        </div>
-    );
+			{/* imitate human hesitation */}
+			<div class={"flex flex-row gap-3 items-center bg-neutral-800 p-2 rounded w-min border border-neutral-700"}>
+				<label
+					for="delete-after"
+					class={"text-lg whitespace-nowrap"}
+				>
+					imitate human hesitation:
+				</label>
+				<div class={"flex flex-row gap-2 items-center"}>
+					<input
+						class={"w-5 h-5 cursor-pointer"}
+						id="imitate-human-hesitation"
+						type="checkbox"
+						checked={imitateHumanHesitation}
+						onInput={handleImitateHumanHesitationChange}
+					/>
+					{imitateHumanHesitation ? "Yes" : "No"}
+				</div>
+			</div>
+		</div>
+	);
 }
 
 export default Settings;
