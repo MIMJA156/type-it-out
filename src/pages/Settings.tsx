@@ -98,7 +98,7 @@ function Settings() {
 			{/* imitate human hesitation */}
 			<div class={"flex flex-row gap-3 items-center bg-neutral-800 p-2 rounded w-min border border-neutral-700"}>
 				<label
-					for="delete-after"
+					for="imitate-human-hesitation"
 					class={"text-lg whitespace-nowrap"}
 				>
 					imitate human hesitation:
